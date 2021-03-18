@@ -10,8 +10,6 @@ def store(request):
     data = cartData(request)
 
     cartItems = data['cartItems']
-    order = data['order']
-    items = data['items']
 
     products = Product.objects.all()
     if user.is_authenticated == False:

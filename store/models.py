@@ -22,19 +22,22 @@ class Cart(models.Model):
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=100, null=True)
 
+    def getId(self):
+        return self.id 
+
     def __str__(self):
 	    return str(self.id)
 
     @property
     def get_cart_total(self):
-        orderitems = self.orderitem_set.all()
-        total = sum([item.get_total for item in orderitems])
+        order_items = ProductCart.objects.get(cart=self).get_product()
+        total = sum([item.get_total for item in order_items])
         return total 
 
     @property
     def get_cart_items(self):
-        orderitems = self.orderitem_set.all()
-        total = sum([item.quantity for item in orderitems])
+        order_items = ProductCart.objects.get(cart=self).get_product()
+        total = sum([item.quantity for item in order_items])
         return total 
 
 class ProductCart(models.Model):
@@ -47,6 +50,10 @@ class ProductCart(models.Model):
     def get_total(self):
         total = self.product.price * self.quantity
         return total
+
+    def get_product(self):
+        return self.product
+    
 
 class Order(models.Model):
     status = models.SmallIntegerField(
