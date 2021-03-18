@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,6 +15,8 @@
             {{error}}
         {% endif %}
         <input type="submit" value="Submit">
+        
     </form>
+    <a hrel="{% url 'register' %}"> Đăng ký</a>
 </body>
 </html>

@@ -13,8 +13,6 @@ class Image(models.Model):
         upload_to=custom_media_path, max_length=100, default="default.jpg"
     )
 
-# Create your models here.
-
 class Comment(models.Model):
     content = models.CharField("content", max_length=255)
     rate = models.IntegerField("rate", default=1)
