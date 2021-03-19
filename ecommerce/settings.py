@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import pymysql
 import os 
-
+from dotenv import load_dotenv
+load_dotenv(".env")
 
 pymysql.version_info = (1, 4, 6, 'final', 0)
 pymysql.install_as_MySQLdb()
@@ -81,16 +82,15 @@ WSGI_APPLICATION = 'ecommerce.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        "ENGINE": 'django.db.backends.mysql',
-        "NAME": 'ecom',
-        "USER": 'root',
-        "PASSWORD": 'root',
-        "HOST": 'localhost',
-        "PORT": 3306,
-    }
+    "default": {
+        "ENGINE": os.getenv("DATABASE_DRIVER"),
+        "NAME": os.getenv("DATABASE_NAME"),
+        "USER": os.getenv("DATABASE_USER"),
+        "PASSWORD": os.getenv("DATABASE_PWD"),
+        "HOST": os.getenv("DATABASE_HOST"),
+        "PORT": os.getenv("DATABASE_PORT"),
+    },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

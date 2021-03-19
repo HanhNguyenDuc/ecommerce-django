@@ -10,7 +10,7 @@ def custom_media_path(instance, filename):
 
 class Image(models.Model):
     img_url = models.FileField(
-        upload_to=custom_media_path, max_length=100, default="default.jpg"
+        upload_to=custom_media_path, max_length=255, default="default.jpg"
     )
 
 class Comment(models.Model):

@@ -30,21 +30,21 @@ class Cart(models.Model):
 
     @property
     def get_cart_total(self):
-        order_items = ProductCart.objects.get(cart=self).get_product()
+        order_items = ProductCart.objects.filter(cart=self)
         total = sum([item.get_total for item in order_items])
         return total 
 
     @property
     def get_cart_items(self):
-        order_items = ProductCart.objects.get(cart=self).get_product()
+        order_items = ProductCart.objects.filter(cart=self)
         total = sum([item.quantity for item in order_items])
         return total 
 
 class ProductCart(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField("quantity")
-    price = models.FloatField("price")
+    quantity = models.IntegerField("quantity", default=1)
+    price = models.FloatField("price", default=10000)
 
     @property
     def get_total(self):

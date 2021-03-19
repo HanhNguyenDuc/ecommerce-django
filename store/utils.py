@@ -15,6 +15,7 @@ def cookieCart(request):
 	order = {'get_cart_total':0, 'get_cart_items':0, 'shipping':False}
 	cartItems = order['get_cart_items']
 
+	print("[info] Cart: {}".format(cart))
 	for i in cart:
 		try:
 			cartItems += cart[i]['quantity']
@@ -34,6 +35,8 @@ def cookieCart(request):
 
 		except:
 			pass
+
+	print(items)
 			
 	return {'cartItems':cartItems ,'order':order, 'items':items}
 
