@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 import json
 import datetime
 from .models import * 
@@ -8,15 +8,16 @@ from .utils import cookieCart, cartData, guestOrder
 def store(request):
     user = request.user
     data = cartData(request)
-
-    cart = Cart.objects.get(user=user, complete=False, is_current_cart=True)
-    product_cart_list = ProductCart.objects.filter(cart=cart)
-
-    products = Product.objects.all()
     if user.is_authenticated == False:
-        context = {"user":0,'products':products, 'cartItems':cartItems}
-        return render(request, 'store/store.html', context)
+        # context = {"user":0,'products':products, 'cartItems':cartItems}
+        # return render(request, 'store/store.html', context)
+
+        return HttpResponseRedirect('/login')
     else:
+        cart = Cart.objects.get(user=user, complete=False, is_current_cart=True)
+        product_cart_list = ProductCart.objects.filter(cart=cart)
+
+        products = Product.objects.all()
         return render(request, 'store/store.html', {"user":1, "first_name": user.first_name, "last_name": user.last_name, 
         'products':products, 'cartItems':product_cart_list.count()})
 

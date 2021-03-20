@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .forms import *
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from .models import *
 from store.models import *
 from store.utils import cookieCart, cartData, guestOrder
@@ -36,65 +36,12 @@ def user_login(request):
                 items = data['items']
 
                 products = Product.objects.all()
-                return render(request, 'store/store.html', {"user":1, "first_name": user.first_name, "last_name": user.last_name, 'products':products, 'cartItems':cartItems})
+                # return render(request, 'store/store.html', {"user":1, "first_name": user.first_name, "last_name": user.last_name, 'products':products, 'cartItems':cartItems})
+                return HttpResponseRedirect('/')
     else:
         form = LoginForm()
         return render(request, 'register/login.html', {'form': form})
 
-
-# def list_product(request):
-#     user = request.user
-#     context = {}
-#     if request.method == "GET":
-#         products = Product.objects.all()
-#         context["products"] = products
-#         if user.is_authenticated != False:
-#             context["user"] = {
-#                 "display_name": user.first_name + user.last_name
-#             }
-#             context["cart"] = Cart.objects.get(user=user, is_current_cart=is_current_cart)
-#             context["cart_product"] = ProductCart.objects.filter(cart=context.get("cart"))
-
-# def add_to_cart(request):
-#     user = request.user
-#     if user.is_authenticated == False:
-#         return JsonResponse({
-#             "error": "no authentication credential provided"
-#         })
-#     if request.method == "POST":
-#         data = request.POST
-#         cart = Cart.objects.get(user=user, is_current_cart=True)
-#         if data.get("product_id") == None:
-#             return JsonResponse({
-#                 "error": "Bad request"
-#             })
-#         if data.get("quantity") == None:
-#             data["quantity"] = 1
-        
-#         product = Product.objects.get(id=data.get("product_id"))
-#         new_product_cart = ProductCart(
-#             cart=cart,
-#             product=product,
-#             quantity=quantity,
-#             price=product.price * data.get("quantity")
-#         )
-#         new_product_cart.save()
-#         return HttpResponseRedirect("/products")
-#     return JsonResponse({
-#         "error": "method is now allowed"
-#     })
-
-
-# def get_cart(request):
-#     user = request.user
-#     if user.is_authenticated == False:
-#         return JsonResponse({
-#             "error": "no authentication credential provided",
-#         })
-#     if request.method == "GET":
-#         context = {}
-#         context["cart"] = 
-        
 
 
 def index(request):
@@ -105,4 +52,11 @@ def index(request):
     else:
         return render(request, 'register/index.html', {"first_name": user.first_name, "last_name": user.last_name})
 
-
+def user_logout(request):
+    user = request.user
+    if user.is_authenticated:
+        logout(request)
+        return HttpResponseRedirect('/login')
+    return JsonResponse({
+        "msg": "No user provided"
+    })
