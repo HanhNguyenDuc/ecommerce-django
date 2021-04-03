@@ -16,7 +16,12 @@
 					</div>
 					<div id="shipping-info">
 						<hr>
-						<p>Shipping Unit: Amazon</p>
+						<p>Shipping Unit: </p>
+						<select name="shipping_unit" id="shipping_unit">
+							{% for shipping_unit in shipping_units %}
+								<option value="{{shipping_unit.id}}">{{shipping_unit.name}}</option>
+							{% endfor %}
+						</select>
 						<hr>
 						<hr>
 						<p>Shipping Information: </p>
@@ -38,8 +43,11 @@
 						</div>
 					</div>
 					<hr>
-					{% if order_status %}
+					{% if order_status == "done" %}
 					<p style="color: red">Thanh toán thành công</p>
+					{% endif %}
+					{% if order_status == "mailed" %}
+					<p style="color: red">Trạng thái đơn hàng sẽ được gửi qua email của bạn</p>
 					{% endif %}
 					<input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
 				</form>

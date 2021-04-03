@@ -16,9 +16,8 @@ class Product(models.Model):
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     created_time = models.TimeField(auto_now_add=True)
-    is_current_cart = models.BooleanField("is_current_cart")
     complete = models.BooleanField(default=False)
     transaction_id = models.CharField(max_length=100, null=True)
 
@@ -40,10 +39,10 @@ class Cart(models.Model):
         total = sum([item.quantity for item in order_items])
         return total 
 
-class ProductCart(models.Model):
+class CartDetail(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField("quantity", default=1)
+    quantity = models.IntegerField("quantity", default=0)
     price = models.FloatField("price", default=10000)
 
     @property

@@ -1,0 +1,139 @@
+{
+    "register": {
+        "POST-form": {
+            "request": {
+                "username": "string",
+                "password": "string",
+                "email": "string",
+                "city": "string",
+                "district": "string",
+                "description": "string",
+                "first_name": "string",
+                "last_name": "string"
+            },
+            "response": {
+                "status": "int",
+                "msg": "string"
+            }
+        }
+    },
+    "login": {
+        "POST-form": {
+            "username": "string",
+            "password": "string"
+        },
+        "response": {
+            "access_token": "string",
+            "refrest_token": "string"
+        }
+    },
+    "list-product": {
+        "GET": {
+            "request":{
+                "search_query": "string, not required",
+                "order_type": "string, desc or asc, not required",
+                "order_by": "string, name or price, not required"
+            },
+            "response - array": {
+                "id": "int",
+                "price": "float",
+                "quantity": "int",
+                "desc": "string"
+            }
+        }
+    },
+    "get-product": {
+        "GET": {
+            "request": {
+                "product_id": "int"
+            },
+            "response": {
+                "id": "int",
+                "price": "float",
+                "quantity": "int",
+                "desc": "string"
+            }
+        }
+    },
+    "create-cart": {
+        "POST (authenticated-header)": {
+            "request": {
+            },
+            "response": {
+                "id": "int"
+            }
+        }
+    },
+    "get-current-cart": {
+        "GET (authenticated-header)": {
+            "request": {},
+            "response": {
+                "status": "int",
+                "item - list": {
+                    "id": "int",
+                    "item": {
+                        "id": "int",
+                        "name": "string",
+                        "price": "float"
+                    },
+                    "quantity": "int"
+                }
+            }
+        }
+    },
+    "create-order": {
+        "POST (authenticated-header)": {
+            "request": {
+                "cart-id": "int",
+                "payment-id": "int"
+            },
+            "response": {
+                "cart": {
+                    "id": "int"
+                },
+                "date": "bigint - millisecond",
+                "total": "float"
+            }
+        }
+    },
+    "get-order": {
+        "GET (authenticated-header)": {
+            "request": {
+                "order-id": "int"
+            },
+            "response - list": {
+                "cart": {
+                    "id": "int"
+                },
+                "date": "bigint - millisecond",
+                "total": "float"
+            }
+        }
+    },
+    "list-order": {
+        "GET (authenticated-header)": {
+            "request": {
+                "search_query": "string, not required",
+                "order_type": "string, desc or asc, not required",
+                "order_by": "string, time or total, not required"
+            },
+            "response": {
+                "cart": {
+                    "id": "int"
+                },
+                "date": "bigint - millisecond",
+                "total": "float"
+            }
+        }
+    },
+    "list-payment": {
+        "GET (authenticated-header)": {
+            "request": {
+            },
+            "response - list": {
+                "name": "string",
+                "mode-of-payment": "int"
+            }
+        }
+    }
+}

@@ -41,18 +41,14 @@ def cookieCart(request):
 	return {'cartItems':cartItems ,'order':order, 'items':items}
 
 def cartData(request):
-	if request.user.is_authenticated:
-		cookieData = cookieCart(request)
-		user = request.user
-		order, created = Cart.objects.get_or_create(user=user, complete=False, is_current_cart=True)
-		cartItems = cookieData['cartItems']
-		items = cookieData['items']
-		
-	else:
-		cookieData = cookieCart(request)
-		cartItems = cookieData['cartItems']
-		order = cookieData['order']
-		items = cookieData['items']
+	cookieData = cookieCart(request)
+	cartItems = cookieData.get("cartItems")
+	if cartItems is None:
+		cartItems = []
+	order = cookieData['order']
+	items = cookieData.get('items')
+	if items is None:
+		return []
 
 	return {'cartItems':cartItems ,'order':order, 'items':items}
 

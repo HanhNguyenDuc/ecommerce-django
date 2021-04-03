@@ -84,16 +84,16 @@
 
 			</ul>
 			<div class="form-inline my-2 my-lg-0">
-				{%if user == 0%}
+				{% if user == 0 %}
 					<a href="/login" class="btn btn-light" style="border-radius: 5px;">Login</a>
 				{%else%}
 					<a href="#" class="btn btn-light" style="border-radius: 5px;">{{first_name}} {{last_name}}</a>
+					<a href="/logout" style="color: white;">Logout</a>
 				{%endif%}
 				<a href="{% url 'cart' %}">
 					<img id="cart-icon" src="{% static 'images/cart.png' %}">
 				</a>
 				<a href="{% url 'cart' %}" class="btn btn-danger" style="border-radius: 5px;">{{cartItems}}</a>
-				<a href="/logout" style="color: white;">Logout</a>
 			</div>
 		</div>
 	</nav>

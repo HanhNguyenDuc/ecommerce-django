@@ -5,6 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from .models import *
 from store.models import *
 from store.utils import cookieCart, cartData, guestOrder
+
 # Create your views here.
 def register(request):
     if request.method == "POST":
@@ -14,10 +15,8 @@ def register(request):
             new_user.set_password(form.cleaned_data.get('password'))
             new_user.save()
             return HttpResponseRedirect('/login')
-        
     else:
         form = RegisterForm
-    
     return render(request, 'register/register.html', {'form': form})
 
 def user_login(request):
