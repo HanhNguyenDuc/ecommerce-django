@@ -2,25 +2,26 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponseRedirect
 import json
 import datetime
-from .models import * 
+from .models import *
 from .utils import cookieCart, cartData, guestOrder
+
 
 def store(request):
     user = request.user
-    if user.is_authenticated == False:
+    if not user.is_authenticated:
         products = Product.objects.all()
         if request.GET.get("search") is not None:
             product_name = request.GET.get("search")
-            products = products.filter(name__contains=product_name)
+            products = products.filter(name__icontains=product_name)
         data = cartData(request)
-        context = {"user":0,'products':products, 'cartItems':data.get("cartItems")}
+        context = {"user": 0, 'products': products, 'cartItems': data.get("cartItems")}
         return render(request, 'store/store.html', context)
     else:
         if len(Cart.objects.filter(user=user, complete=False)) == 0:
             cart = Cart(user=user, complete=False)
             cart.save()
         cart = Cart.objects.filter(user=user, complete=False).latest('id')
-        if cart.complete == True:
+        if cart.complete:
             cart = Cart(user=user, complete=False)
             cart.save()
         product_cart_list = CartDetail.objects.filter(cart=cart)
@@ -28,25 +29,27 @@ def store(request):
         products = Product.objects.all()
         if request.GET.get("search") is not None:
             product_name = request.GET.get("search")
-            products = products.filter(name__contains=product_name)
-        return render(request, 'store/store.html', {"user":1, "first_name": user.first_name, "last_name": user.last_name, 
-            'products':products, 'cartItems':product_cart_list.count()})
+            products = products.filter(name__icontains=product_name)
+        return render(request, 'store/store.html',
+                      {"user": 1, "first_name": user.first_name, "last_name": user.last_name,
+                       'products': products, 'cartItems': product_cart_list.count()})
+
 
 def cart(request):
     user = request.user
 
-    if user.is_authenticated == False:
+    if not user.is_authenticated:
         data = cartData(request)
         order = data['order']
         items = data['items']
-        context = {"user":0,'items':items, 'order':order, 'cartItems':data.get("cartItems")}
+        context = {"user": 0, 'items': items, 'order': order, 'cartItems': data.get("cartItems")}
         return render(request, 'store/cart.html', context)
     else:
         if len(Cart.objects.filter(user=user, complete=False)) == 0:
             cart = Cart(user=user, complete=False)
             cart.save()
         cart = Cart.objects.filter(user=user, complete=False).latest('id')
-        if cart.complete == True:
+        if cart.complete:
             cart = Cart(user=user, complete=False)
             cart.save()
         product_cart_list = CartDetail.objects.filter(cart=cart)
@@ -59,14 +62,16 @@ def cart(request):
             "get_cart_total": cart_total,
             "get_cart_items": cart_items,
         }
-        return render(request, 'store/cart.html', {"user":1, "first_name": user.first_name, "last_name": user.last_name,
-            'items':product_cart_list, 'order': order, 'cartItems':product_cart_list.count()})
+        return render(request, 'store/cart.html',
+                      {"user": 1, "first_name": user.first_name, "last_name": user.last_name,
+                       'items': product_cart_list, 'order': order, 'cartItems': product_cart_list.count()})
+
 
 def checkout(request):
     user = request.user
     shipping_units = ShippingUnit.objects.all()
 
-    if user.is_authenticated == False:
+    if not user.is_authenticated:
         data = cartData(request)
         cartItems = data['cartItems']
         order = data['order']
@@ -81,8 +86,8 @@ def checkout(request):
             new_order = Order(cart=new_cart, status=1)
             new_order.save()
 
-
-        context = {"user":0,'items':items, 'order':order, 'cartItems':cartItems, "order_status": "mailed", "shipping_units": shipping_units}
+        context = {"user": 0, 'items': items, 'order': order, 'cartItems': cartItems, "order_status": "mailed",
+                   "shipping_units": shipping_units}
         return render(request, 'store/checkout.html', context)
     else:
         is_complete = False
@@ -92,7 +97,7 @@ def checkout(request):
                 current_cart = Cart(user=user, complete=False)
                 current_cart.save()
             new_order = Order(cart=current_cart, status=1)
-            current_cart.complete=True
+            current_cart.complete = True
             current_cart.save()
             new_cart = Cart(user=user, complete=False)
             new_cart.save()
@@ -105,7 +110,7 @@ def checkout(request):
             cart = Cart(user=user, complete=False)
             cart.save()
         product_cart_list = CartDetail.objects.filter(cart=cart)
-        
+
         cart_total = 0
         cart_items = 0
         for product_cart in product_cart_list:
@@ -115,61 +120,63 @@ def checkout(request):
             "get_cart_total": cart_total,
             "get_cart_items": cart_items,
         }
-        context = {"user":1, "first_name": user.first_name, "last_name": user.last_name,
-        'items':product_cart_list, 'order':order, 'cartItems':product_cart_list.count(), "shipping_units": shipping_units}
+        context = {"user": 1, "first_name": user.first_name, "last_name": user.last_name,
+                   'items': product_cart_list, 'order': order, 'cartItems': product_cart_list.count(),
+                   "shipping_units": shipping_units}
         if is_complete == True:
             context["order_status"] = "done"
         return render(request, 'store/checkout.html', context)
-	
+
 
 def processOrder(request):
-	transaction_id = datetime.datetime.now().timestamp()
-	data = json.loads(request.body)
+    transaction_id = datetime.datetime.now().timestamp()
+    data = json.loads(request.body)
 
-	if request.user.is_authenticated:
-		user = request.user
-		cart, created = Cart.objects.get_or_create(user=user, complete=False)
-	else:
-		user, cart = guestOrder(request, data)
+    if request.user.is_authenticated:
+        user = request.user
+        cart, created = Cart.objects.get_or_create(user=user, complete=False)
+    else:
+        user, cart = guestOrder(request, data)
 
-	total = float(data['form']['total'])
-	cart.transaction_id = transaction_id
+    total = float(data['form']['total'])
+    cart.transaction_id = transaction_id
 
-	if total == cart.get_cart_total:
-		cart.complete = True
-	cart.save()
+    if total == cart.get_cart_total:
+        cart.complete = True
+    cart.save()
 
-	if cart.complete == True:
-		Order.objects.create(
-		    cart=cart,
-	    )
+    if cart.complete == True:
+        Order.objects.create(
+            cart=cart,
+        )
 
-	return JsonResponse('Payment submitted...', safe=False)
+    return JsonResponse('Payment submitted...', safe=False)
+
 
 def update_item(request):
-	data = json.loads(request.body)
-	product_id = data['productId']
-	action = data['action']
-	print('Action:', action)
-	print('Product:', product_id)
+    data = json.loads(request.body)
+    product_id = data['productId']
+    action = data['action']
+    print('Action:', action)
+    print('Product:', product_id)
 
-	user = request.user
-	product = Product.objects.get(id=product_id)
-	cart = Cart.objects.filter(user=user, complete=False).latest('id')
-	if cart.complete == True:
-		cart = Cart(user=user, complete=False)
-		cart.save()
+    user = request.user
+    product = Product.objects.get(id=product_id)
+    cart = Cart.objects.filter(user=user, complete=False).latest('id')
+    if cart.complete == True:
+        cart = Cart(user=user, complete=False)
+        cart.save()
 
-	orderItem, created = CartDetail.objects.get_or_create(cart=cart, product=product)
+    orderItem, created = CartDetail.objects.get_or_create(cart=cart, product=product)
 
-	if action == 'add':
-		orderItem.quantity = (orderItem.quantity + 1)
-	elif action == 'remove':
-		orderItem.quantity = (orderItem.quantity - 1)
+    if action == 'add':
+        orderItem.quantity = (orderItem.quantity + 1)
+    elif action == 'remove':
+        orderItem.quantity = (orderItem.quantity - 1)
 
-	orderItem.save()
+    orderItem.save()
 
-	if orderItem.quantity <= 0:
-		orderItem.delete()
+    if orderItem.quantity <= 0:
+        orderItem.delete()
 
-	return JsonResponse('Item was added', safe=False)
+    return JsonResponse('Item was added', safe=False)
