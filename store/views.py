@@ -9,11 +9,12 @@ def store(request):
     user = request.user
     if user.is_authenticated == False:
         products = Product.objects.all()
+        if request.GET.get("search") is not None:
+            product_name = request.GET.get("search")
+            products = products.filter(name__contains=product_name)
         data = cartData(request)
         context = {"user":0,'products':products, 'cartItems':data.get("cartItems")}
         return render(request, 'store/store.html', context)
-
-        return HttpResponseRedirect('/login')
     else:
         if len(Cart.objects.filter(user=user, complete=False)) == 0:
             cart = Cart(user=user, complete=False)
@@ -25,6 +26,9 @@ def store(request):
         product_cart_list = CartDetail.objects.filter(cart=cart)
 
         products = Product.objects.all()
+        if request.GET.get("search") is not None:
+            product_name = request.GET.get("search")
+            products = products.filter(name__contains=product_name)
         return render(request, 'store/store.html', {"user":1, "first_name": user.first_name, "last_name": user.last_name, 
             'products':products, 'cartItems':product_cart_list.count()})
 
