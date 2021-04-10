@@ -15,6 +15,9 @@ def store(request):
 
         return HttpResponseRedirect('/login')
     else:
+        if len(Cart.objects.filter(user=user, complete=False)) == 0:
+            cart = Cart(user=user, complete=False)
+            cart.save()
         cart = Cart.objects.filter(user=user, complete=False).latest('id')
         if cart.complete == True:
             cart = Cart(user=user, complete=False)
@@ -35,6 +38,9 @@ def cart(request):
         context = {"user":0,'items':items, 'order':order, 'cartItems':data.get("cartItems")}
         return render(request, 'store/cart.html', context)
     else:
+        if len(Cart.objects.filter(user=user, complete=False)) == 0:
+            cart = Cart(user=user, complete=False)
+            cart.save()
         cart = Cart.objects.filter(user=user, complete=False).latest('id')
         if cart.complete == True:
             cart = Cart(user=user, complete=False)
@@ -78,7 +84,7 @@ def checkout(request):
         is_complete = False
         if request.method == "POST":
             current_cart = Cart.objects.filter(user=user, complete=False).latest('id')
-            if current_cart.complete == True:
+            if current_cart.complete == True or len(cart) == 0:
                 current_cart = Cart(user=user, complete=False)
                 current_cart.save()
             new_order = Order(cart=current_cart, status=1)
@@ -87,10 +93,13 @@ def checkout(request):
             new_cart = Cart(user=user, complete=False)
             new_cart.save()
             is_complete = True
+        if len(Cart.objects.filter(user=user, complete=False)) == 0:
+            cart = Cart(user=user, complete=False)
+            cart.save()
         cart = Cart.objects.filter(user=user, complete=False).latest('id')
         if cart.complete == True:
-                cart = Cart(user=user, complete=False)
-                cart.save()
+            cart = Cart(user=user, complete=False)
+            cart.save()
         product_cart_list = CartDetail.objects.filter(cart=cart)
         
         cart_total = 0
