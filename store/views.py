@@ -88,7 +88,7 @@ def checkout(request):
         is_complete = False
         if request.method == "POST":
             current_cart = Cart.objects.filter(user=user, complete=False).latest('id')
-            if current_cart.complete == True or len(cart) == 0:
+            if current_cart.complete == True:
                 current_cart = Cart(user=user, complete=False)
                 current_cart.save()
             new_order = Order(cart=current_cart, status=1)
