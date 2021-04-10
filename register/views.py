@@ -6,6 +6,7 @@ from .models import *
 from store.models import *
 from store.utils import cookieCart, cartData, guestOrder
 
+
 # Create your views here.
 def register(request):
     if request.method == "POST":
@@ -19,11 +20,13 @@ def register(request):
         form = RegisterForm
     return render(request, 'register/register.html', {'form': form})
 
+
 def user_login(request):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(request, username=form.cleaned_data.get('username'), password=form.cleaned_data.get('password'))
+            user = authenticate(request, username=form.cleaned_data.get('username'),
+                                password=form.cleaned_data.get('password'))
             if user is None:
                 return render(request, 'register/login.html', {'error': "Login information is wrong", 'form': form})
             else:
@@ -42,14 +45,14 @@ def user_login(request):
         return render(request, 'register/login.html', {'form': form})
 
 
-
 def index(request):
     user = request.user
-    if user.is_authenticated == False:
+    if not user.is_authenticated:
         form = LoginForm()
         return HttpResponseRedirect('/login', {'form': form})
     else:
         return render(request, 'register/index.html', {"first_name": user.first_name, "last_name": user.last_name})
+
 
 def user_logout(request):
     user = request.user
