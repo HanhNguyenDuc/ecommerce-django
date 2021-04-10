@@ -6,6 +6,18 @@ from .models import *
 from .utils import cookieCart, cartData, guestOrder
 
 
+def check_cart(user):
+    if len(Cart.objects.filter(user=user, complete=False)) == 0:
+        cart = Cart(user=user, complete=False)
+        cart.save()
+    cart = Cart.objects.filter(user=user, complete=False).latest('id')
+    if cart.complete:
+        cart = Cart(user=user, complete=False)
+        cart.save()
+    product_cart_list = CartDetail.objects.filter(cart=cart)
+    return product_cart_list
+
+
 def store(request):
     user = request.user
     if not user.is_authenticated:
@@ -17,14 +29,7 @@ def store(request):
         context = {"user": 0, 'products': products, 'cartItems': data.get("cartItems")}
         return render(request, 'store/store.html', context)
     else:
-        if len(Cart.objects.filter(user=user, complete=False)) == 0:
-            cart = Cart(user=user, complete=False)
-            cart.save()
-        cart = Cart.objects.filter(user=user, complete=False).latest('id')
-        if cart.complete:
-            cart = Cart(user=user, complete=False)
-            cart.save()
-        product_cart_list = CartDetail.objects.filter(cart=cart)
+        product_cart_list = check_cart(user)
 
         products = Product.objects.all()
         if request.GET.get("search") is not None:
@@ -45,14 +50,8 @@ def cart(request):
         context = {"user": 0, 'items': items, 'order': order, 'cartItems': data.get("cartItems")}
         return render(request, 'store/cart.html', context)
     else:
-        if len(Cart.objects.filter(user=user, complete=False)) == 0:
-            cart = Cart(user=user, complete=False)
-            cart.save()
-        cart = Cart.objects.filter(user=user, complete=False).latest('id')
-        if cart.complete:
-            cart = Cart(user=user, complete=False)
-            cart.save()
-        product_cart_list = CartDetail.objects.filter(cart=cart)
+        product_cart_list = check_cart(user)
+
         cart_total = 0
         cart_items = 0
         for product_cart in product_cart_list:
