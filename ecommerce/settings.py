@@ -31,7 +31,7 @@ SECRET_KEY = 'al1zthzp22jz7j)4g1yqvguk7t_!sl-j7pktjuee6jr&=$fmxt'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost:8000", "adventure-asia.tech"]
 
 
 # Application definition
